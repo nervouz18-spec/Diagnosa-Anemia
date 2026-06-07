@@ -1,0 +1,181 @@
+{
+  "theme": "Light",
+  "archetype": "Organic & Earthy / Modern Minimalist",
+  "domain": "Health/Medical",
+  "colors": {
+    "background": "#F9FAF9",
+    "surface": "#FFFFFF",
+    "surface_alt": "#F2F4F2",
+    "primary": "#3A5A40",
+    "primary_hover": "#2B4330",
+    "secondary": "#A3B18A",
+    "text_main": "#1A1D1A",
+    "text_muted": "#5C615C",
+    "border": "#E5E8E5",
+    "success": "#2D6A4F",
+    "danger": "#D72638",
+    "danger_hover": "#B01B29",
+    "warning": "#F4A261"
+  },
+  "typography": {
+    "google_fonts_url": "https://fonts.googleapis.com/css2?family=Epilogue:wght@400;500;600;700&family=Work+Sans:wght@400;500;600&display=swap",
+    "heading_font": "'Epilogue', sans-serif",
+    "body_font": "'Work Sans', sans-serif",
+    "scale": {
+      "h1": "2.5rem",
+      "h2": "2rem",
+      "h3": "1.5rem",
+      "h4": "1.25rem",
+      "body": "1rem",
+      "small": "0.875rem",
+      "micro": "0.75rem"
+    },
+    "line_height": {
+      "heading": "1.2",
+      "body": "1.6"
+    }
+  },
+  "spacing": {
+    "xs": "0.25rem",
+    "sm": "0.5rem",
+    "md": "1rem",
+    "lg": "1.5rem",
+    "xl": "2rem",
+    "2xl": "3rem",
+    "3xl": "4rem",
+    "section": "6rem"
+  },
+  "borders": {
+    "radius": {
+      "sm": "4px",
+      "md": "8px",
+      "lg": "12px",
+      "pill": "9999px"
+    },
+    "width": "1px",
+    "style": "solid"
+  },
+  "shadows": {
+    "sm": "0 1px 2px rgba(0,0,0,0.05)",
+    "md": "0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03)",
+    "lg": "0 10px 15px -3px rgba(0,0,0,0.05), 0 4px 6px -2px rgba(0,0,0,0.02)",
+    "float": "0 20px 25px -5px rgba(0,0,0,0.05), 0 10px 10px -5px rgba(0,0,0,0.02)"
+  },
+  "components": {
+    "navbar": {
+      "background": "rgba(255, 255, 255, 0.85)",
+      "backdrop_blur": "12px",
+      "border_bottom": "1px solid #E5E8E5",
+      "height": "72px",
+      "layout": "flex space-between align-center",
+      "sticky": true
+    },
+    "card": {
+      "background": "#FFFFFF",
+      "border": "1px solid #E5E8E5",
+      "border_radius": "12px",
+      "padding": "1.5rem",
+      "shadow": "0 4px 6px -1px rgba(0,0,0,0.05)"
+    },
+    "button": {
+      "primary": {
+        "background": "#3A5A40",
+        "color": "#FFFFFF",
+        "border_radius": "8px",
+        "padding": "0.75rem 1.5rem",
+        "font_weight": "600",
+        "transition": "all 0.2s ease"
+      },
+      "ghost": {
+        "background": "transparent",
+        "color": "#3A5A40",
+        "border": "1px solid #3A5A40",
+        "border_radius": "8px",
+        "padding": "0.75rem 1.5rem",
+        "font_weight": "600"
+      },
+      "danger": {
+        "background": "#D72638",
+        "color": "#FFFFFF",
+        "border_radius": "8px",
+        "padding": "0.5rem 1rem",
+        "font_weight": "500"
+      }
+    },
+    "forms": {
+      "input": {
+        "background": "#FFFFFF",
+        "border": "1px solid #E5E8E5",
+        "border_radius": "8px",
+        "padding": "0.75rem 1rem",
+        "focus_ring": "2px solid #3A5A40",
+        "color": "#1A1D1A"
+      },
+      "checkbox": {
+        "size": "20px",
+        "border_radius": "4px",
+        "checked_bg": "#3A5A40",
+        "border": "1px solid #E5E8E5",
+        "card_wrapper": "border: 1px solid #E5E8E5; padding: 1rem; border-radius: 8px; display: flex; align-items: center; gap: 0.75rem; cursor: pointer; transition: all 0.2s ease",
+        "card_wrapper_hover": "border-color: #3A5A40; background: #F2F4F2"
+      }
+    },
+    "table": {
+      "container": "overflow-x-auto border border-[#E5E8E5] rounded-lg",
+      "header_bg": "#F2F4F2",
+      "cell_padding": "1rem",
+      "border_bottom": "1px solid #E5E8E5",
+      "color": "#1A1D1A"
+    },
+    "badge": {
+      "padding": "0.25rem 0.75rem",
+      "border_radius": "9999px",
+      "font_size": "0.75rem",
+      "font_weight": "600",
+      "info": "bg: #E3F2FD, color: #1565C0",
+      "success": "bg: #E8F5E9, color: #2E7D32"
+    },
+    "alert": {
+      "border_radius": "8px",
+      "padding": "1rem",
+      "border_left": "4px solid",
+      "background": "#F2F4F2",
+      "color": "#1A1D1A"
+    },
+    "progress_bar": {
+      "height": "8px",
+      "border_radius": "9999px",
+      "background_track": "#E5E8E5",
+      "background_fill": "#3A5A40"
+    }
+  },
+  "layout": {
+    "container_max_width": "1200px",
+    "dashboard": {
+      "type": "sidebar_layout",
+      "sidebar_width": "260px",
+      "sidebar_bg": "#FFFFFF",
+      "topbar_height": "72px",
+      "topbar_bg": "#FFFFFF",
+      "stat_grid": "grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem"
+    }
+  },
+  "interactions": {
+    "hover_transition": "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+    "button_active_scale": "transform: scale(0.98)",
+    "card_hover_transform": "transform: translateY(-4px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05)"
+  },
+  "assets": {
+    "icon_set": "Phosphor Icons",
+    "cdn_link": "<script src=\"https://unpkg.com/@phosphor-icons/web\"></script>"
+  },
+  "instructions_to_main_agent": [
+    "Write all styles explicitly into /app/assets/style.css. Use plain CSS, no tailwind classes since this is a pure HTML/PHP setup.",
+    "Use CSS variables (:root) for colors, fonts, and spacing to maintain the design system cleanly.",
+    "Apply data-testid to all interactive elements (buttons, inputs, links) and key components in the PHP views.",
+    "For the Diagnosis page, implement the checkboxes within card-like wrappers for a modern, tap-friendly UI.",
+    "Implement the admin layout with a fixed sidebar (left) and responsive topbar + main content area.",
+    "Make tables fully responsive with overflow-x-auto wrappers and modern styling.",
+    "Do NOT alter the forward chaining logic in the PHP files."
+  ]
+}
