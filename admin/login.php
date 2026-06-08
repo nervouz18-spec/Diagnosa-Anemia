@@ -7,7 +7,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     $username = trim($_POST["username"] ?? '');
     $password = $_POST["password"] ?? '';
 
-    $stmt = $conn->prepare("SELECT id, username, password, nama_lengkap FROM users WHERE username = ? LIMIT 1");
+    $stmt = $conn->prepare("SELECT id, username, password, role FROM users WHERE username = ? LIMIT 1");
     $stmt->bind_param("s", $username);
     $stmt->execute();
     $res = $stmt->get_result();
@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         if (password_verify($password, $row['password'])) {
             $_SESSION['admin']    = $row['username'];
             $_SESSION['admin_id'] = $row['id'];
-            $_SESSION['admin_nama'] = $row['nama_lengkap'];
+            $_SESSION['admin_role'] = $row['role'];
             header("Location: dashboard.php");
             exit;
         } else {

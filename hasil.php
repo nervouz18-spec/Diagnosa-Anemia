@@ -6,12 +6,12 @@ $hasil_diagnosa  = $_SESSION['hasil']           ?? [];
 $selected_gejala = $_SESSION['selected_gejala'] ?? [];
 $pasien          = $_SESSION['pasien']          ?? [];
 
-// Resolve nama gejala dari kode (untuk display)
+// Resolve nama gejala dari kode
 $gejala_map = [];
 if (count($selected_gejala) > 0) {
     $codes = "'" . implode("','", array_map(fn($c) => $conn->real_escape_string($c), $selected_gejala)) . "'";
-    $r = $conn->query("SELECT kode_gejala, nama_gejala FROM gejala WHERE kode_gejala IN ($codes)");
-    while ($row = $r->fetch_assoc()) $gejala_map[$row['kode_gejala']] = $row['nama_gejala'];
+    $r = $conn->query("SELECT kode, nama FROM gejala WHERE kode IN ($codes)");
+    while ($row = $r->fetch_assoc()) $gejala_map[$row['kode']] = $row['nama'];
 }
 
 unset($_SESSION['hasil']);
@@ -45,9 +45,11 @@ include 'partials/public_header.php';
             <span class="badge badge-muted"><?php echo count($selected_gejala); ?> gejala</span>
         </div>
         <div style="display:flex;flex-wrap:wrap;gap:.4rem;">
-            <?php foreach ($selected_gejala as $kode): ?>
-                <span class="badge badge-info" style="background:var(--primary-soft);color:var(--primary);">
+            <?php foreach ($selected_gejala as $kode):
+                $is_umum = in_array($kode, ['G01','G02','G03','G04','G05']); ?>
+                <span class="badge <?php echo $is_umum?'badge-warning':'badge-info'; ?>" style="<?php echo $is_umum?'':'background:var(--primary-soft);color:var(--primary);'; ?>">
                     <?php echo htmlspecialchars($kode); ?> · <?php echo htmlspecialchars($gejala_map[$kode] ?? $kode); ?>
+                    <?php if ($is_umum): ?> · <em style="font-weight:500;">umum</em><?php endif; ?>
                 </span>
             <?php endforeach; ?>
         </div>
@@ -68,7 +70,7 @@ include 'partials/public_header.php';
                 <div class="lbl">kecocokan</div>
             </div>
             <div class="progress"><div class="bar" style="width: <?php echo (int)$hasil['persen']; ?>%;"></div></div>
-            <p class="full"><strong style="color:var(--text);">Solusi:</strong> <?php echo nl2br(htmlspecialchars($hasil['solusi'])); ?></p>
+            <p class="full"><strong style="color:var(--text);">Deskripsi:</strong> <?php echo nl2br(htmlspecialchars($hasil['deskripsi'])); ?></p>
         </div>
         <?php endforeach; ?>
     <?php else: ?>

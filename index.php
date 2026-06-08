@@ -7,6 +7,14 @@ $count_gejala   = $conn->query("SELECT COUNT(*) c FROM gejala")->fetch_assoc()['
 $count_penyakit = $conn->query("SELECT COUNT(*) c FROM penyakit")->fetch_assoc()['c'];
 $count_aturan   = $conn->query("SELECT COUNT(*) c FROM aturan")->fetch_assoc()['c'];
 
+// Gejala umum = G01..G05, sisanya gejala spesifik
+$gejala_umum = []; $gejala_spesifik = [];
+$rs = $conn->query("SELECT * FROM gejala ORDER BY kode ASC");
+while ($r = $rs->fetch_assoc()) {
+    if (in_array($r['kode'], ['G01','G02','G03','G04','G05'])) $gejala_umum[] = $r;
+    else $gejala_spesifik[] = $r;
+}
+
 $page_title = 'Diagnosa';
 $active_nav = 'diagnosa';
 include 'partials/public_header.php';
@@ -76,23 +84,43 @@ include 'partials/public_header.php';
             </div>
         </div>
 
-        <div class="card">
+        <!-- ====== Gejala Umum ====== -->
+        <div class="card" data-testid="gejala-umum-card">
             <div class="card-head">
-                <h3><i class="fa-solid fa-list-check" style="color:var(--primary);margin-right:.4rem;"></i>Daftar Gejala</h3>
+                <div>
+                    <h3 style="margin:0;"><i class="fa-solid fa-asterisk" style="color:var(--primary);margin-right:.4rem;"></i>Gejala Umum</h3>
+                    <p class="text-muted text-sm" style="margin:.25rem 0 0;">Gejala yang muncul pada hampir semua jenis anemia (G01–G05).</p>
+                </div>
+                <span class="badge badge-info">Umum</span>
+            </div>
+            <div class="checkbox-grid" data-testid="gejala-umum-grid">
+                <?php foreach ($gejala_umum as $row): ?>
+                <label class="check-card" data-testid="gejala-<?php echo htmlspecialchars($row['kode']); ?>">
+                    <input type="checkbox" name="gejala[]" value="<?php echo htmlspecialchars($row['kode']); ?>" onchange="updateCount();">
+                    <span class="code"><?php echo htmlspecialchars($row['kode']); ?></span>
+                    <span class="label"><?php echo htmlspecialchars($row['nama']); ?></span>
+                </label>
+                <?php endforeach; ?>
+            </div>
+        </div>
+
+        <!-- ====== Gejala Spesifik ====== -->
+        <div class="card" data-testid="gejala-spesifik-card">
+            <div class="card-head">
+                <div>
+                    <h3 style="margin:0;"><i class="fa-solid fa-list-check" style="color:var(--primary);margin-right:.4rem;"></i>Gejala Spesifik</h3>
+                    <p class="text-muted text-sm" style="margin:.25rem 0 0;">Gejala khas yang membedakan jenis anemia tertentu (G06–G27).</p>
+                </div>
                 <span class="badge badge-info" id="countLabel" data-testid="count-label">0 dipilih</span>
             </div>
-
-            <div class="checkbox-grid" data-testid="gejala-grid">
-                <?php
-                $gejala = $conn->query("SELECT * FROM gejala ORDER BY kode_gejala ASC");
-                while ($row = $gejala->fetch_assoc()):
-                ?>
-                <label class="check-card" data-testid="gejala-<?php echo htmlspecialchars($row['kode_gejala']); ?>">
-                    <input type="checkbox" name="gejala[]" value="<?php echo htmlspecialchars($row['kode_gejala']); ?>" onchange="updateCount();">
-                    <span class="code"><?php echo htmlspecialchars($row['kode_gejala']); ?></span>
-                    <span class="label"><?php echo htmlspecialchars($row['nama_gejala']); ?></span>
+            <div class="checkbox-grid" data-testid="gejala-spesifik-grid">
+                <?php foreach ($gejala_spesifik as $row): ?>
+                <label class="check-card" data-testid="gejala-<?php echo htmlspecialchars($row['kode']); ?>">
+                    <input type="checkbox" name="gejala[]" value="<?php echo htmlspecialchars($row['kode']); ?>" onchange="updateCount();">
+                    <span class="code"><?php echo htmlspecialchars($row['kode']); ?></span>
+                    <span class="label"><?php echo htmlspecialchars($row['nama']); ?></span>
                 </label>
-                <?php endwhile; ?>
+                <?php endforeach; ?>
             </div>
 
             <div class="flex flex-between flex-wrap gap-md mt-md">
@@ -108,15 +136,15 @@ include 'partials/public_header.php';
 
 <script>
 function updateCount() {
-    const n = document.querySelectorAll('.check-card input[type="checkbox"]:checked').length;
+    const n = document.querySelectorAll('input[name="gejala[]"]:checked').length;
     document.getElementById('countLabel').textContent = n + ' dipilih';
 }
 function clearAll() {
-    document.querySelectorAll('.check-card input[type="checkbox"]').forEach(c => c.checked = false);
+    document.querySelectorAll('input[name="gejala[]"]').forEach(c => c.checked = false);
     updateCount();
 }
 function validateDiagnosa() {
-    const n = document.querySelectorAll('.check-card input[type="checkbox"]:checked').length;
+    const n = document.querySelectorAll('input[name="gejala[]"]:checked').length;
     if (n === 0) { alert('Silakan pilih minimal 1 gejala terlebih dahulu.'); return false; }
     return true;
 }

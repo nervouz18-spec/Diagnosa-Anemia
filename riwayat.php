@@ -2,7 +2,6 @@
 include 'config.php';
 session_start();
 
-// Ambil riwayat berdasarkan session_token (anonim)
 $session_token = $_SESSION['user_token'] ?? null;
 $rows = [];
 if ($session_token) {
@@ -34,7 +33,10 @@ include 'partials/public_header.php';
             <a href="index.php" class="btn btn-primary"><i class="fa-solid fa-stethoscope"></i> Mulai Diagnosa</a>
         </div>
     <?php else: ?>
-        <?php foreach ($rows as $i => $row): ?>
+        <?php foreach ($rows as $i => $row):
+            $gjlist = json_decode($row['gejala_dipilih'] ?? '[]', true) ?: [];
+            $hslist = json_decode($row['hasil_dianosa'] ?? '[]', true) ?: [];
+        ?>
         <div class="card" data-testid="riwayat-<?php echo $i; ?>">
             <div class="card-head">
                 <div>
@@ -46,15 +48,28 @@ include 'partials/public_header.php';
                 <span class="text-muted text-sm">#<?php echo (int)$row['id']; ?></span>
             </div>
             <div>
-                <div class="text-muted text-sm" style="margin-bottom:.25rem;">Gejala</div>
+                <div class="text-muted text-sm" style="margin-bottom:.25rem;">Gejala Dipilih</div>
                 <div style="display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:.85rem;">
-                    <?php foreach (explode(',', $row['gejala']) as $g):
-                        $g = trim($g); if ($g==='') continue; ?>
+                    <?php foreach ($gjlist as $g): ?>
                         <span class="badge badge-muted"><?php echo htmlspecialchars($g); ?></span>
                     <?php endforeach; ?>
                 </div>
                 <div class="text-muted text-sm" style="margin-bottom:.25rem;">Hasil Diagnosa</div>
-                <div style="white-space:pre-wrap;background:var(--surface-alt);border-radius:var(--r-md);padding:.85rem 1rem;font-size:.92rem;"><?php echo htmlspecialchars($row['hasil']); ?></div>
+                <?php if (count($hslist) === 0): ?>
+                    <div style="background:var(--surface-alt);border-radius:var(--r-md);padding:.85rem 1rem;font-size:.92rem;" class="text-muted">Tidak ada jenis anemia dengan kecocokan ≥ 80%.</div>
+                <?php else: ?>
+                    <div style="display:flex;flex-direction:column;gap:.5rem;">
+                    <?php foreach ($hslist as $h): ?>
+                        <div style="display:flex;justify-content:space-between;align-items:center;background:var(--primary-soft);border-radius:var(--r-md);padding:.6rem .85rem;">
+                            <div>
+                                <strong><?php echo htmlspecialchars($h['nama'] ?? '-'); ?></strong>
+                                <span class="text-muted text-sm"> · <?php echo htmlspecialchars($h['kode'] ?? ''); ?> · <?php echo (int)($h['match'] ?? 0); ?>/<?php echo (int)($h['total'] ?? 0); ?> gejala</span>
+                            </div>
+                            <span class="badge badge-success"><?php echo (int)($h['persen'] ?? 0); ?>%</span>
+                        </div>
+                    <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
         <?php endforeach; ?>

@@ -23,7 +23,7 @@ include 'partials/public_header.php';
         <div class="feature">
             <div class="ico"><i class="fa-solid fa-bolt"></i></div>
             <h4>Gejala umum</h4>
-            <p>Lemas/mudah lelah, pucat, pusing, sesak napas, jantung berdebar, tangan/kaki dingin, dan lainnya.</p>
+            <p>Kelelahan ekstrem, kulit/bibir pucat, pusing & sakit kepala, sesak napas saat aktivitas, dan detak jantung cepat.</p>
         </div>
         <div class="feature">
             <div class="ico"><i class="fa-solid fa-dna"></i></div>
@@ -41,14 +41,36 @@ include 'partials/public_header.php';
         <h3>Jenis-Jenis Anemia yang Diidentifikasi Sistem</h3>
         <div class="table-wrap mt-md">
             <table class="data">
-                <thead><tr><th>Kode</th><th>Nama Penyakit</th><th>Solusi Awal</th></tr></thead>
+                <thead><tr><th>Kode</th><th>Nama Penyakit</th><th>Deskripsi</th></tr></thead>
                 <tbody>
-                <?php $rs = $conn->query("SELECT * FROM penyakit ORDER BY kode_penyakit");
+                <?php $rs = $conn->query("SELECT * FROM penyakit ORDER BY kode");
                 while ($p = $rs->fetch_assoc()): ?>
                     <tr>
-                        <td><span class="badge badge-muted"><?php echo htmlspecialchars($p['kode_penyakit']); ?></span></td>
-                        <td><strong><?php echo htmlspecialchars($p['nama_penyakit']); ?></strong></td>
-                        <td class="text-muted"><?php echo htmlspecialchars($p['solusi']); ?></td>
+                        <td><span class="badge badge-muted"><?php echo htmlspecialchars($p['kode']); ?></span></td>
+                        <td><strong><?php echo htmlspecialchars($p['nama']); ?></strong></td>
+                        <td class="text-muted"><?php echo htmlspecialchars($p['deskripsi']); ?></td>
+                    </tr>
+                <?php endwhile; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card mt-lg">
+        <h3>Daftar Gejala</h3>
+        <p class="text-muted text-sm">G01–G05 merupakan <strong>gejala umum</strong> yang dimiliki hampir semua jenis anemia; sisanya adalah gejala spesifik.</p>
+        <div class="table-wrap mt-md">
+            <table class="data">
+                <thead><tr><th>Kode</th><th>Nama Gejala</th><th>Tipe</th></tr></thead>
+                <tbody>
+                <?php $gs = $conn->query("SELECT * FROM gejala ORDER BY kode");
+                while ($g = $gs->fetch_assoc()):
+                    $is_umum = in_array($g['kode'], ['G01','G02','G03','G04','G05']);
+                ?>
+                    <tr>
+                        <td><span class="badge badge-muted"><?php echo htmlspecialchars($g['kode']); ?></span></td>
+                        <td><?php echo htmlspecialchars($g['nama']); ?></td>
+                        <td><span class="badge <?php echo $is_umum?'badge-warning':'badge-success'; ?>"><?php echo $is_umum?'Umum':'Spesifik'; ?></span></td>
                     </tr>
                 <?php endwhile; ?>
                 </tbody>

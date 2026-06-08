@@ -9,21 +9,27 @@ $from  = $_GET['from'] ?? '';
 $to    = $_GET['to'] ?? '';
 
 $where = []; $params = []; $types = '';
-if ($q !== '')   { $where[] = "(nama_pasien LIKE ? OR gejala LIKE ? OR hasil LIKE ?)"; $like = "%$q%"; $params[]=$like; $params[]=$like; $params[]=$like; $types.='sss'; }
+if ($q !== '')   { $where[] = "(nama_pasien LIKE ? OR gejala_dipilih LIKE ? OR hasil_dianosa LIKE ?)"; $like = "%$q%"; $params[]=$like; $params[]=$like; $params[]=$like; $types.='sss'; }
 if ($from !== ''){ $where[] = "tanggal >= ?"; $params[] = $from.' 00:00:00'; $types.='s'; }
 if ($to !== '')  { $where[] = "tanggal <= ?"; $params[] = $to.' 23:59:59'; $types.='s'; }
 $where_sql = $where ? 'WHERE '.implode(' AND ', $where) : '';
 
 // Export CSV
 if (isset($_GET['export'])) {
-    $sql = "SELECT id, tanggal, nama_pasien, umur, jenis_kelamin, gejala, hasil FROM riwayat $where_sql ORDER BY tanggal DESC";
+    $sql = "SELECT id, tanggal, nama_pasien, umur, jenis_kelamin, gejala_dipilih, hasil_dianosa FROM riwayat $where_sql ORDER BY tanggal DESC";
     if ($params) { $stmt = $conn->prepare($sql); $stmt->bind_param($types, ...$params); $stmt->execute(); $res = $stmt->get_result(); }
     else { $res = $conn->query($sql); }
     header('Content-Type: text/csv; charset=utf-8');
     header('Content-Disposition: attachment; filename="laporan_diagnosa_'.date('Ymd_His').'.csv"');
     $out = fopen('php://output', 'w');
-    fputcsv($out, ['ID','Tanggal','Nama Pasien','Umur','JK','Gejala','Hasil']);
-    while ($r = $res->fetch_assoc()) fputcsv($out, $r);
+    fputcsv($out, ['ID','Tanggal','Nama Pasien','Umur','JK','Gejala Dipilih','Hasil Diagnosa']);
+    while ($r = $res->fetch_assoc()) {
+        $g = json_decode($r['gejala_dipilih'] ?? '[]', true) ?: [];
+        $h = json_decode($r['hasil_dianosa'] ?? '[]', true) ?: [];
+        $g_text = implode(',', $g);
+        $h_text = count($h) === 0 ? 'Tidak ada hasil >=80%' : implode(' | ', array_map(fn($x)=>($x['kode']??'').' '.($x['nama']??'').' '.($x['persen']??'').'%', $h));
+        fputcsv($out, [$r['id'], $r['tanggal'], $r['nama_pasien'], $r['umur'], $r['jenis_kelamin'], $g_text, $h_text]);
+    }
     fclose($out); exit;
 }
 
@@ -36,7 +42,7 @@ if (isset($_GET['hapus'])) {
 
 $msg = $_GET['msg'] ?? ''; $msg_type = $_GET['t'] ?? 'info';
 
-// Pagination simple
+// Pagination
 $page = max(1, intval($_GET['page'] ?? 1));
 $per  = 15;
 $off  = ($page-1) * $per;
@@ -54,7 +60,6 @@ $page_title = 'Laporan Diagnosa';
 $active     = 'laporan';
 include '../partials/admin_header.php';
 
-// Build current query string for pagination
 $qs = $_GET; unset($qs['page']);
 $base = '?' . http_build_query($qs);
 ?>
@@ -73,7 +78,7 @@ $base = '?' . http_build_query($qs);
         <div class="form-row">
             <div class="form-group">
                 <label>Pencarian</label>
-                <input type="text" name="q" value="<?php echo htmlspecialchars($q); ?>" placeholder="Nama pasien / kode gejala / hasil" data-testid="input-q">
+                <input type="text" name="q" value="<?php echo htmlspecialchars($q); ?>" placeholder="Nama pasien / kode gejala / nama penyakit" data-testid="input-q">
             </div>
             <div class="form-group">
                 <label>Dari Tanggal</label>
@@ -104,7 +109,10 @@ $base = '?' . http_build_query($qs);
             <tbody>
                 <?php if ($rs->num_rows === 0): ?>
                     <tr><td colspan="6" class="text-center text-muted" style="padding:2rem;">Tidak ada data.</td></tr>
-                <?php else: while ($r = $rs->fetch_assoc()): ?>
+                <?php else: while ($r = $rs->fetch_assoc()):
+                    $glist = json_decode($r['gejala_dipilih'] ?? '[]', true) ?: [];
+                    $hlist = json_decode($r['hasil_dianosa'] ?? '[]', true) ?: [];
+                ?>
                     <tr data-testid="row-laporan-<?php echo $r['id']; ?>">
                         <td>#<?php echo (int)$r['id']; ?></td>
                         <td class="text-sm"><?php echo date('d M Y · H:i', strtotime($r['tanggal'])); ?></td>
@@ -114,8 +122,22 @@ $base = '?' . http_build_query($qs);
                                 <div class="text-muted text-sm"><?php echo (int)$r['umur']; ?> th · <?php echo $r['jenis_kelamin']==='L'?'L':($r['jenis_kelamin']==='P'?'P':'-'); ?></div>
                             <?php endif; ?>
                         </td>
-                        <td class="text-sm" style="max-width:200px;"><?php echo htmlspecialchars(mb_strimwidth($r['gejala'], 0, 60, '…')); ?></td>
-                        <td class="text-sm" style="max-width:280px;"><?php echo nl2br(htmlspecialchars(mb_strimwidth($r['hasil'], 0, 110, '…'))); ?></td>
+                        <td class="text-sm" style="max-width:200px;">
+                            <?php echo htmlspecialchars(implode(', ', array_slice($glist, 0, 8))).(count($glist)>8?'…':''); ?>
+                            <div class="text-muted text-sm"><?php echo count($glist); ?> gejala</div>
+                        </td>
+                        <td class="text-sm" style="max-width:300px;">
+                            <?php if (count($hlist) === 0): ?>
+                                <span class="text-muted">Tidak ada hasil ≥80%</span>
+                            <?php else:
+                                foreach ($hlist as $h): ?>
+                                    <div style="display:flex;justify-content:space-between;align-items:center;gap:.4rem;margin-bottom:.2rem;">
+                                        <span><strong><?php echo htmlspecialchars($h['nama'] ?? '-'); ?></strong></span>
+                                        <span class="badge badge-success"><?php echo (int)($h['persen']??0); ?>%</span>
+                                    </div>
+                            <?php endforeach;
+                            endif; ?>
+                        </td>
                         <td><a href="?hapus=<?php echo $r['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Hapus entri ini?');" data-testid="btn-hapus-laporan-<?php echo $r['id']; ?>"><i class="fa-solid fa-trash"></i></a></td>
                     </tr>
                 <?php endwhile; endif; ?>

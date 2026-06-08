@@ -16,7 +16,7 @@ include '../partials/admin_header.php';
 ?>
 
 <div class="page-header">
-    <h2>Selamat datang, <?php echo htmlspecialchars($_SESSION['admin_nama'] ?: $_SESSION['admin']); ?> 👋</h2>
+    <h2>Selamat datang, <?php echo htmlspecialchars($_SESSION['admin']); ?> 👋</h2>
     <p class="lead">Ringkasan basis pengetahuan & aktivitas diagnosa.</p>
 </div>
 
@@ -58,11 +58,11 @@ include '../partials/admin_header.php';
         </a>
         <a href="crud_penyakit.php" class="feature" style="text-decoration:none;color:inherit;display:block;" data-testid="qa-penyakit">
             <div class="ico"><i class="fa-solid fa-virus"></i></div>
-            <h4>Kelola Penyakit</h4><p>Kelola jenis anemia & solusi penanganan.</p>
+            <h4>Kelola Penyakit</h4><p>Kelola jenis anemia & deskripsi penanganan.</p>
         </a>
         <a href="crud_aturan.php" class="feature" style="text-decoration:none;color:inherit;display:block;" data-testid="qa-aturan">
             <div class="ico"><i class="fa-solid fa-diagram-project"></i></div>
-            <h4>Kelola Aturan</h4><p>Atur relasi penyakit ↔ gejala (knowledge base).</p>
+            <h4>Kelola Aturan</h4><p>Atur relasi gejala ↔ penyakit (knowledge base).</p>
         </a>
         <a href="laporan.php" class="feature" style="text-decoration:none;color:inherit;display:block;" data-testid="qa-laporan">
             <div class="ico"><i class="fa-solid fa-clipboard-list"></i></div>
@@ -85,13 +85,19 @@ include '../partials/admin_header.php';
             if ($rs->num_rows === 0): ?>
                 <tr><td colspan="5" class="text-center text-muted" style="padding:2rem;">Belum ada diagnosa tercatat.</td></tr>
             <?php else:
-                while ($r = $rs->fetch_assoc()): ?>
+                while ($r = $rs->fetch_assoc()):
+                    $glist = json_decode($r['gejala_dipilih'] ?? '[]', true) ?: [];
+                    $hlist = json_decode($r['hasil_dianosa'] ?? '[]', true) ?: [];
+                    $hsummary = count($hlist) > 0
+                        ? implode(', ', array_map(fn($h)=>($h['kode']??'').' '.($h['persen']??'').'%', array_slice($hlist,0,2)))
+                        : '— tidak ada hasil ≥80%';
+                ?>
                 <tr>
                     <td>#<?php echo (int)$r['id']; ?></td>
                     <td><?php echo date('d M Y · H:i', strtotime($r['tanggal'])); ?></td>
                     <td><?php echo htmlspecialchars($r['nama_pasien'] ?: '-'); ?></td>
-                    <td class="text-muted text-sm" style="max-width:220px;"><?php echo htmlspecialchars(mb_strimwidth($r['gejala'], 0, 50, '…')); ?></td>
-                    <td class="text-muted text-sm" style="max-width:280px;"><?php echo htmlspecialchars(mb_strimwidth($r['hasil'], 0, 80, '…')); ?></td>
+                    <td class="text-muted text-sm" style="max-width:220px;"><?php echo htmlspecialchars(implode(', ', array_slice($glist, 0, 6))).(count($glist)>6?'…':''); ?></td>
+                    <td class="text-muted text-sm" style="max-width:280px;"><?php echo htmlspecialchars($hsummary); ?></td>
                 </tr>
                 <?php endwhile;
             endif; ?>

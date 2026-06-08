@@ -5,22 +5,19 @@ if (!isset($_SESSION['admin'])) { header('Location: login.php'); exit; }
 
 $msg = ''; $msg_type = '';
 
-// Tambah user
 if (isset($_POST['tambah'])) {
     $username = trim($_POST['username']);
-    $nama     = trim($_POST['nama_lengkap']);
     $password = $_POST['password'];
     if ($username && $password) {
         $hash = password_hash($password, PASSWORD_DEFAULT);
-        $stmt = $conn->prepare("INSERT INTO users (username, password, nama_lengkap, role) VALUES (?, ?, ?, 'admin')");
-        $stmt->bind_param("sss", $username, $hash, $nama);
+        $stmt = $conn->prepare("INSERT INTO users (username, password, role) VALUES (?, ?, 'Admin')");
+        $stmt->bind_param("ss", $username, $hash);
         if ($stmt->execute()) { $msg = "User ditambahkan."; $msg_type = 'success'; }
         else { $msg = "Gagal: ".$stmt->error; $msg_type = 'danger'; }
         $stmt->close();
     } else { $msg = "Username & password wajib diisi."; $msg_type = 'danger'; }
 }
 
-// Reset password
 if (isset($_POST['reset_pass'])) {
     $id = intval($_POST['id']);
     $new = $_POST['new_password'] ?? '';
@@ -33,19 +30,16 @@ if (isset($_POST['reset_pass'])) {
     } else { $msg = "Password minimal 4 karakter."; $msg_type = 'danger'; }
 }
 
-// Edit nama / username
 if (isset($_POST['edit'])) {
     $id       = intval($_POST['id']);
     $username = trim($_POST['username']);
-    $nama     = trim($_POST['nama_lengkap']);
-    $stmt = $conn->prepare("UPDATE users SET username=?, nama_lengkap=? WHERE id=?");
-    $stmt->bind_param("ssi", $username, $nama, $id);
+    $stmt = $conn->prepare("UPDATE users SET username=? WHERE id=?");
+    $stmt->bind_param("si", $username, $id);
     if ($stmt->execute()) { $msg = "User diperbarui."; $msg_type = 'success'; }
     else { $msg = "Gagal: ".$stmt->error; $msg_type = 'danger'; }
     $stmt->close();
 }
 
-// Hapus user
 if (isset($_GET['hapus'])) {
     $id = intval($_GET['hapus']);
     if ($id === ($_SESSION['admin_id'] ?? 0)) {
@@ -64,7 +58,7 @@ if (isset($_GET['hapus'])) {
 
 if (isset($_GET['msg'])) { $msg = $_GET['msg']; $msg_type = $_GET['t'] ?? 'info'; }
 
-$users = $conn->query("SELECT id, username, nama_lengkap, role, created_at FROM users ORDER BY id ASC");
+$users = $conn->query("SELECT id, username, role FROM users ORDER BY id ASC");
 
 $page_title = 'Manajemen User';
 $active     = 'users';
@@ -89,10 +83,6 @@ include '../partials/admin_header.php';
                 <input type="text" name="username" placeholder="contoh: admin2" required data-testid="input-username">
             </div>
             <div class="form-group">
-                <label>Nama Lengkap</label>
-                <input type="text" name="nama_lengkap" placeholder="Nama lengkap" data-testid="input-nama">
-            </div>
-            <div class="form-group">
                 <label>Password</label>
                 <input type="password" name="password" placeholder="Minimal 4 karakter" required data-testid="input-password">
             </div>
@@ -108,7 +98,7 @@ include '../partials/admin_header.php';
     </div>
     <div class="table-wrap">
         <table class="data">
-            <thead><tr><th>#</th><th>Username</th><th>Nama Lengkap</th><th>Role</th><th>Dibuat</th><th style="width:260px;">Aksi</th></tr></thead>
+            <thead><tr><th>#</th><th>Username</th><th>Role</th><th style="width:260px;">Aksi</th></tr></thead>
             <tbody>
             <?php while ($u = $users->fetch_assoc()):
                 $is_me = ((int)$u['id'] === (int)($_SESSION['admin_id'] ?? 0));
@@ -118,9 +108,7 @@ include '../partials/admin_header.php';
                         <input type="hidden" name="id" value="<?php echo $u['id']; ?>">
                         <td>#<?php echo (int)$u['id']; ?></td>
                         <td><input type="text" name="username" value="<?php echo htmlspecialchars($u['username']); ?>" required></td>
-                        <td><input type="text" name="nama_lengkap" value="<?php echo htmlspecialchars($u['nama_lengkap'] ?? ''); ?>"></td>
-                        <td><span class="badge <?php echo $is_me?'badge-success':'badge-info'; ?>"><?php echo htmlspecialchars($u['role'] ?? 'admin'); ?><?php echo $is_me?' · anda':''; ?></span></td>
-                        <td class="text-muted text-sm"><?php echo $u['created_at'] ? date('d M Y', strtotime($u['created_at'])) : '-'; ?></td>
+                        <td><span class="badge <?php echo $is_me?'badge-success':'badge-info'; ?>"><?php echo htmlspecialchars($u['role'] ?? 'Admin'); ?><?php echo $is_me?' · anda':''; ?></span></td>
                         <td class="actions-cell">
                             <button type="submit" name="edit" class="btn btn-secondary btn-sm" data-testid="btn-edit-user-<?php echo $u['id']; ?>"><i class="fa-solid fa-pen"></i></button>
                             <button type="button" class="btn btn-secondary btn-sm" onclick="toggleReset(<?php echo $u['id']; ?>);" data-testid="btn-reset-pass-<?php echo $u['id']; ?>"><i class="fa-solid fa-key"></i></button>
@@ -131,7 +119,7 @@ include '../partials/admin_header.php';
                     </form>
                 </tr>
                 <tr id="reset-<?php echo $u['id']; ?>" style="display:none;">
-                    <td colspan="6" style="background:var(--surface-alt);">
+                    <td colspan="4" style="background:var(--surface-alt);">
                         <form method="post" style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;">
                             <input type="hidden" name="id" value="<?php echo $u['id']; ?>">
                             <strong>Reset Password untuk <?php echo htmlspecialchars($u['username']); ?>:</strong>
