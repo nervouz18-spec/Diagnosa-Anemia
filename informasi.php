@@ -61,7 +61,7 @@ include 'partials/public_header.php';
         <p class="text-muted text-sm">G01–G05 merupakan <strong>gejala umum</strong> yang dimiliki hampir semua jenis anemia; sisanya adalah gejala spesifik.</p>
         <div class="table-wrap mt-md">
             <table class="data">
-                <thead><tr><th>Kode</th><th>Nama Gejala</th><th>Tipe</th></tr></thead>
+                <thead><tr><th style="width:90px;">Kode</th><th style="width:220px;">Nama Gejala</th><th>Deskripsi</th><th style="width:100px;">Tipe</th></tr></thead>
                 <tbody>
                 <?php $gs = $conn->query("SELECT * FROM gejala ORDER BY kode");
                 while ($g = $gs->fetch_assoc()):
@@ -69,7 +69,14 @@ include 'partials/public_header.php';
                 ?>
                     <tr>
                         <td><span class="badge badge-muted"><?php echo htmlspecialchars($g['kode']); ?></span></td>
-                        <td><?php echo htmlspecialchars($g['nama']); ?></td>
+                        <td><strong><?php echo htmlspecialchars($g['nama']); ?></strong></td>
+                        <td class="text-muted">
+                            <?php if (!empty($g['deskripsi'])): ?>
+                                <?php echo nl2br(htmlspecialchars($g['deskripsi'])); ?>
+                            <?php else: ?>
+                                <em class="text-muted text-sm">—</em>
+                            <?php endif; ?>
+                        </td>
                         <td><span class="badge <?php echo $is_umum?'badge-warning':'badge-success'; ?>"><?php echo $is_umum?'Umum':'Spesifik'; ?></span></td>
                     </tr>
                 <?php endwhile; ?>

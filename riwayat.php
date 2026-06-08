@@ -56,16 +56,13 @@ include 'partials/public_header.php';
                 </div>
                 <div class="text-muted text-sm" style="margin-bottom:.25rem;">Hasil Diagnosa</div>
                 <?php if (count($hslist) === 0): ?>
-                    <div style="background:var(--surface-alt);border-radius:var(--r-md);padding:.85rem 1rem;font-size:.92rem;" class="text-muted">Tidak ada jenis anemia dengan kecocokan ≥ 80%.</div>
+                    <div style="background:var(--surface-alt);border-radius:var(--r-md);padding:.85rem 1rem;font-size:.92rem;" class="text-muted">Tidak ada penyakit terdeteksi.</div>
                 <?php else: ?>
                     <div style="display:flex;flex-direction:column;gap:.5rem;">
                     <?php foreach ($hslist as $h): ?>
-                        <div style="display:flex;justify-content:space-between;align-items:center;background:var(--primary-soft);border-radius:var(--r-md);padding:.6rem .85rem;">
-                            <div>
-                                <strong><?php echo htmlspecialchars($h['nama'] ?? '-'); ?></strong>
-                                <span class="text-muted text-sm"> · <?php echo htmlspecialchars($h['kode'] ?? ''); ?> · <?php echo (int)($h['match'] ?? 0); ?>/<?php echo (int)($h['total'] ?? 0); ?> gejala</span>
-                            </div>
-                            <span class="badge badge-success"><?php echo (int)($h['persen'] ?? 0); ?>%</span>
+                        <div style="background:var(--primary-soft);border-radius:var(--r-md);padding:.6rem .85rem;">
+                            <strong><?php echo htmlspecialchars($h['nama'] ?? '-'); ?></strong>
+                            <span class="text-muted text-sm"> · <?php echo htmlspecialchars($h['kode'] ?? ''); ?></span>
                         </div>
                     <?php endforeach; ?>
                     </div>

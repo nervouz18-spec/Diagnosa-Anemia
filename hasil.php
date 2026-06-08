@@ -25,7 +25,7 @@ include 'partials/public_header.php';
     <div class="page-header">
         <span class="badge badge-success" data-testid="result-badge"><i class="fa-solid fa-circle-check"></i> Analisis Selesai</span>
         <h1 style="margin-top:.85rem;">Hasil Diagnosa Anda</h1>
-        <p class="lead">Berikut kemungkinan jenis anemia berdasarkan gejala yang Anda pilih. Penyakit terdeteksi bila Anda memilih <strong>≥ 1 gejala umum</strong> dan <strong>≥ 1 gejala spesifik</strong>. Diurutkan dari persentase tertinggi.</p>
+        <p class="lead">Berikut kemungkinan jenis anemia berdasarkan gejala yang Anda pilih. Penyakit terdeteksi bila Anda memilih <strong>≥ 1 gejala umum</strong> dan <strong>≥ 1 gejala spesifik</strong>.</p>
     </div>
 
     <?php if (!empty($pasien['nama']) || !empty($pasien['umur']) || !empty($pasien['jenis_kelamin'])): ?>
@@ -59,24 +59,28 @@ include 'partials/public_header.php';
 
     <?php if (count($hasil_diagnosa) > 0): ?>
         <?php foreach ($hasil_diagnosa as $i => $hasil): ?>
-        <div class="result-card" data-testid="result-<?php echo $i; ?>">
-            <div>
-                <span class="badge badge-success">#<?php echo $i+1; ?> · <?php echo htmlspecialchars($hasil['kode_penyakit']); ?></span>
-                <h3 style="margin:.5rem 0 .25rem;"><?php echo htmlspecialchars($hasil['nama_penyakit']); ?></h3>
-                <div class="meta">
-                    <i class="fa-solid fa-check-double"></i> <?php echo (int)$hasil['match']; ?> dari <?php echo (int)$hasil['total']; ?> gejala cocok
-                    &nbsp;·&nbsp;
-                    <span title="Gejala umum cocok"><i class="fa-solid fa-asterisk"></i> <?php echo count($hasil['match_umum']); ?> umum</span>
-                    &nbsp;·&nbsp;
-                    <span title="Gejala spesifik cocok"><i class="fa-solid fa-bullseye"></i> <?php echo count($hasil['match_spesifik']); ?> spesifik</span>
+        <div class="card" data-testid="result-<?php echo $i; ?>" style="border-left:4px solid var(--primary);">
+            <div class="card-head">
+                <div>
+                    <span class="badge badge-success">#<?php echo $i+1; ?> · <?php echo htmlspecialchars($hasil['kode_penyakit']); ?></span>
+                    <h3 style="margin:.5rem 0 .25rem;"><?php echo htmlspecialchars($hasil['nama_penyakit']); ?></h3>
                 </div>
             </div>
-            <div class="percent">
-                <div class="num"><?php echo (int)$hasil['persen']; ?>%</div>
-                <div class="lbl">kecocokan</div>
+            <div class="text-muted text-sm" style="margin-bottom:.5rem;">
+                <i class="fa-solid fa-check-double" style="color:var(--primary);"></i> Gejala yang cocok:
             </div>
-            <div class="progress"><div class="bar" style="width: <?php echo (int)$hasil['persen']; ?>%;"></div></div>
-            <p class="full"><strong style="color:var(--text);">Deskripsi:</strong> <?php echo nl2br(htmlspecialchars($hasil['deskripsi'])); ?></p>
+            <div style="display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:1rem;">
+                <?php foreach ($hasil['gejala_cocok'] as $g):
+                    $g_umum = in_array($g, ['G01','G02','G03','G04','G05']); ?>
+                    <span class="badge <?php echo $g_umum?'badge-warning':'badge-success'; ?>">
+                        <?php echo htmlspecialchars($g); ?> · <?php echo htmlspecialchars($gejala_map[$g] ?? $g); ?>
+                    </span>
+                <?php endforeach; ?>
+            </div>
+            <div style="border-top:1px solid var(--border);padding-top:1rem;">
+                <strong style="color:var(--text);">Deskripsi:</strong>
+                <p style="margin:.4rem 0 0;color:var(--text-muted);"><?php echo nl2br(htmlspecialchars($hasil['deskripsi'])); ?></p>
+            </div>
         </div>
         <?php endforeach; ?>
     <?php else: ?>
@@ -90,11 +94,11 @@ include 'partials/public_header.php';
     <?php endif; ?>
 
     <div class="alert alert-warning" style="margin-top:1.5rem;" data-testid="disclaimer">
-        <i class="fa-solid fa-hospital"></i>
+        <i class="fa-solid fa-user-doctor"></i>
         <div>
-            <strong>Disclaimer Medis.</strong>
-            Hasil ini hanya deteksi awal otomatis dan <em>tidak menggantikan diagnosa dokter</em>.
-            Untuk kelanjutan pemeriksaan, silakan kunjungi puskesmas atau rumah sakit terdekat.
+            <strong>Catatan Penting.</strong>
+            Ini hanya <em>diagnosa sementara</em> berdasarkan basis pengetahuan sistem.
+            Untuk kelanjutan pemeriksaan dan diagnosa pasti, silakan konsultasikan ke <strong>dokter ahli</strong> atau fasilitas kesehatan terdekat.
         </div>
     </div>
 

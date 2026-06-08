@@ -45,7 +45,8 @@ INSERT INTO penyakit (kode, nama, deskripsi) VALUES
 CREATE TABLE gejala (
   id INT AUTO_INCREMENT PRIMARY KEY,
   kode VARCHAR(10) UNIQUE NOT NULL,
-  nama VARCHAR(100) NOT NULL
+  nama VARCHAR(100) NOT NULL,
+  deskripsi TEXT DEFAULT NULL
 );
 
 INSERT INTO gejala (kode, nama) VALUES

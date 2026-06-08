@@ -27,7 +27,7 @@ if (isset($_GET['export'])) {
         $g = json_decode($r['gejala_dipilih'] ?? '[]', true) ?: [];
         $h = json_decode($r['hasil_dianosa'] ?? '[]', true) ?: [];
         $g_text = implode(',', $g);
-        $h_text = count($h) === 0 ? 'Tidak ada hasil >=80%' : implode(' | ', array_map(fn($x)=>($x['kode']??'').' '.($x['nama']??'').' '.($x['persen']??'').'%', $h));
+        $h_text = count($h) === 0 ? 'Tidak terdeteksi' : implode(' | ', array_map(fn($x)=>($x['kode']??'').' '.($x['nama']??''), $h));
         fputcsv($out, [$r['id'], $r['tanggal'], $r['nama_pasien'], $r['umur'], $r['jenis_kelamin'], $g_text, $h_text]);
     }
     fclose($out); exit;
@@ -128,12 +128,12 @@ $base = '?' . http_build_query($qs);
                         </td>
                         <td class="text-sm" style="max-width:300px;">
                             <?php if (count($hlist) === 0): ?>
-                                <span class="text-muted">Tidak ada hasil ≥80%</span>
+                                <span class="text-muted">Tidak terdeteksi</span>
                             <?php else:
                                 foreach ($hlist as $h): ?>
-                                    <div style="display:flex;justify-content:space-between;align-items:center;gap:.4rem;margin-bottom:.2rem;">
-                                        <span><strong><?php echo htmlspecialchars($h['nama'] ?? '-'); ?></strong></span>
-                                        <span class="badge badge-success"><?php echo (int)($h['persen']??0); ?>%</span>
+                                    <div style="margin-bottom:.2rem;">
+                                        <strong><?php echo htmlspecialchars($h['nama'] ?? '-'); ?></strong>
+                                        <span class="text-muted text-sm"> (<?php echo htmlspecialchars($h['kode'] ?? '-'); ?>)</span>
                                     </div>
                             <?php endforeach;
                             endif; ?>

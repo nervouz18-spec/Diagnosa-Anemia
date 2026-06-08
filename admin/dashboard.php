@@ -89,8 +89,8 @@ include '../partials/admin_header.php';
                     $glist = json_decode($r['gejala_dipilih'] ?? '[]', true) ?: [];
                     $hlist = json_decode($r['hasil_dianosa'] ?? '[]', true) ?: [];
                     $hsummary = count($hlist) > 0
-                        ? implode(', ', array_map(fn($h)=>($h['kode']??'').' '.($h['persen']??'').'%', array_slice($hlist,0,2)))
-                        : '— tidak ada hasil ≥80%';
+                        ? implode(', ', array_map(fn($h)=>($h['kode']??''), array_slice($hlist,0,3)))
+                        : '— tidak terdeteksi';
                 ?>
                 <tr>
                     <td>#<?php echo (int)$r['id']; ?></td>
