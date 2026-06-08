@@ -25,7 +25,7 @@ include 'partials/public_header.php';
     <div class="page-header">
         <span class="badge badge-success" data-testid="result-badge"><i class="fa-solid fa-circle-check"></i> Analisis Selesai</span>
         <h1 style="margin-top:.85rem;">Hasil Diagnosa Anda</h1>
-        <p class="lead">Berikut kemungkinan jenis anemia berdasarkan gejala yang Anda pilih, dengan tingkat kecocokan minimal <strong>80%</strong>.</p>
+        <p class="lead">Berikut kemungkinan jenis anemia berdasarkan gejala yang Anda pilih. Penyakit terdeteksi bila Anda memilih <strong>≥ 1 gejala umum</strong> dan <strong>≥ 1 gejala spesifik</strong>. Diurutkan dari persentase tertinggi.</p>
     </div>
 
     <?php if (!empty($pasien['nama']) || !empty($pasien['umur']) || !empty($pasien['jenis_kelamin'])): ?>
@@ -63,7 +63,13 @@ include 'partials/public_header.php';
             <div>
                 <span class="badge badge-success">#<?php echo $i+1; ?> · <?php echo htmlspecialchars($hasil['kode_penyakit']); ?></span>
                 <h3 style="margin:.5rem 0 .25rem;"><?php echo htmlspecialchars($hasil['nama_penyakit']); ?></h3>
-                <div class="meta"><i class="fa-solid fa-check-double"></i> <?php echo (int)$hasil['match']; ?> dari <?php echo (int)$hasil['total']; ?> gejala cocok</div>
+                <div class="meta">
+                    <i class="fa-solid fa-check-double"></i> <?php echo (int)$hasil['match']; ?> dari <?php echo (int)$hasil['total']; ?> gejala cocok
+                    &nbsp;·&nbsp;
+                    <span title="Gejala umum cocok"><i class="fa-solid fa-asterisk"></i> <?php echo count($hasil['match_umum']); ?> umum</span>
+                    &nbsp;·&nbsp;
+                    <span title="Gejala spesifik cocok"><i class="fa-solid fa-bullseye"></i> <?php echo count($hasil['match_spesifik']); ?> spesifik</span>
+                </div>
             </div>
             <div class="percent">
                 <div class="num"><?php echo (int)$hasil['persen']; ?>%</div>
@@ -77,8 +83,8 @@ include 'partials/public_header.php';
         <div class="alert alert-warning" data-testid="no-result">
             <i class="fa-solid fa-triangle-exclamation"></i>
             <div>
-                <strong>Tidak ada jenis anemia dengan kecocokan ≥ 80%.</strong><br>
-                Coba periksa kembali pilihan gejala Anda, atau konsultasikan langsung dengan tenaga medis untuk pemeriksaan lanjutan.
+                <strong>Tidak ada penyakit yang terdeteksi.</strong><br>
+                Pastikan Anda memilih <strong>minimal 1 gejala umum (G01–G05)</strong> dan <strong>minimal 1 gejala spesifik</strong> yang sesuai. Bila gejala terus berlanjut, segera konsultasikan ke tenaga medis.
             </div>
         </div>
     <?php endif; ?>

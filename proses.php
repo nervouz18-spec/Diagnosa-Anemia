@@ -12,37 +12,56 @@ $nama_pasien    = trim($_POST['nama_pasien'] ?? '');
 $umur           = isset($_POST['umur']) && $_POST['umur'] !== '' ? (int)$_POST['umur'] : null;
 $jenis_kelamin  = trim($_POST['jenis_kelamin'] ?? '');
 
+// Daftar gejala umum (sesuai spesifikasi: G01–G05)
+$gejala_umum_codes = ['G01','G02','G03','G04','G05'];
+
 // =====================================================================
-// FORWARD CHAINING — logika perhitungan TIDAK DIUBAH
-// percent = round(match_count / total_gejala * 100), threshold >= 80%
+// FORWARD CHAINING — Rule Baru:
+//   Penyakit terdeteksi apabila:
+//     (a) minimal 1 gejala umum (G01-G05) dipilih, DAN
+//     (b) minimal 1 gejala spesifik dari penyakit tsb dipilih.
+//   Persentase = (jumlah gejala penyakit yang cocok) / (total aturan penyakit) * 100
+//   Hasil diurutkan dari persentase tertinggi.
 // =====================================================================
 $hasil_diagnosa = [];
-$penyakit = $conn->query("SELECT * FROM penyakit");
+$penyakit = $conn->query("SELECT * FROM penyakit ORDER BY kode");
 
 while ($p = $penyakit->fetch_assoc()) {
-    // Ambil gejala untuk penyakit ini
-    $aturan_gejala = [];
-    $gejalanya = $conn->query("SELECT gejala_kode FROM aturan WHERE penyakit_kode = '".$p['kode']."'");
-    while ($ag = $gejalanya->fetch_assoc()) $aturan_gejala[] = $ag['gejala_kode'];
+    // Ambil semua aturan gejala untuk penyakit ini
+    $all_rules = [];
+    $r = $conn->query("SELECT gejala_kode FROM aturan WHERE penyakit_kode = '".$p['kode']."'");
+    while ($a = $r->fetch_assoc()) $all_rules[] = $a['gejala_kode'];
 
-    // Hitung jumlah gejala yang cocok
-    $match_count = count(array_intersect($selected_gejala, $aturan_gejala));
-    $total_gejala = count($aturan_gejala);
-    $percent = $total_gejala > 0 ? round($match_count / $total_gejala * 100) : 0;
+    // Pisahkan gejala penyakit ini menjadi umum vs spesifik
+    $rules_umum     = array_values(array_intersect($all_rules, $gejala_umum_codes));
+    $rules_spesifik = array_values(array_diff($all_rules, $gejala_umum_codes));
 
-    // Jika persentase cocok >= 80%, tambahkan ke hasil
-    if ($percent >= 80) {
+    // Cocokkan dengan gejala yang dipilih user
+    $match_umum     = array_values(array_intersect($selected_gejala, $rules_umum));
+    $match_spesifik = array_values(array_intersect($selected_gejala, $rules_spesifik));
+
+    // Penyakit terdiagnosa hanya jika ≥1 gejala umum DAN ≥1 gejala spesifik cocok
+    if (count($match_umum) >= 1 && count($match_spesifik) >= 1) {
+        $match_count = count($match_umum) + count($match_spesifik);
+        $total       = count($all_rules);
+        $percent     = $total > 0 ? round($match_count / $total * 100) : 0;
+
         $hasil_diagnosa[] = [
-            'kode_penyakit' => $p['kode'],
-            'nama_penyakit' => $p['nama'],
-            'deskripsi'     => $p['deskripsi'],
-            'persen'        => $percent,
-            'match'         => $match_count,
-            'total'         => $total_gejala,
-            'gejala_cocok'  => array_values(array_intersect($selected_gejala, $aturan_gejala)),
+            'kode_penyakit'   => $p['kode'],
+            'nama_penyakit'   => $p['nama'],
+            'deskripsi'       => $p['deskripsi'],
+            'persen'          => $percent,
+            'match'           => $match_count,
+            'total'           => $total,
+            'match_umum'      => $match_umum,
+            'match_spesifik'  => $match_spesifik,
+            'gejala_cocok'    => array_merge($match_umum, $match_spesifik),
         ];
     }
 }
+
+// Urutkan hasil dari persentase tertinggi
+usort($hasil_diagnosa, fn($a, $b) => $b['persen'] <=> $a['persen']);
 // =====================================================================
 
 // Token sesi untuk pelacakan riwayat user anonim

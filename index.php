@@ -44,10 +44,10 @@ include 'partials/public_header.php';
             <h4>Cara Kerja Singkat</h4>
             <p class="text-muted" style="margin:0;">Pilih gejala yang Anda alami, sistem mencocokkan dengan aturan, lalu menghitung persentase kecocokan tiap jenis anemia.</p>
             <ul>
-                <li><i class="fa-solid fa-check"></i> Pilih gejala (centang yang sesuai)</li>
+                <li><i class="fa-solid fa-check"></i> Pilih ≥1 gejala umum (G01–G05)</li>
+                <li><i class="fa-solid fa-check"></i> Pilih ≥1 gejala spesifik (G06–G27)</li>
                 <li><i class="fa-solid fa-check"></i> Sistem cocokkan ke basis pengetahuan</li>
-                <li><i class="fa-solid fa-check"></i> Tampilkan hasil ≥ 80% kecocokan</li>
-                <li><i class="fa-solid fa-check"></i> Rekomendasi solusi awal</li>
+                <li><i class="fa-solid fa-check"></i> Tampilkan kemungkinan jenis anemia</li>
             </ul>
         </div>
     </div>
@@ -56,7 +56,7 @@ include 'partials/public_header.php';
 <main class="page" id="diagnosa">
     <div class="page-header">
         <h2>Form Diagnosa Anemia</h2>
-        <p class="lead">Centang gejala yang Anda alami. Sistem akan menganalisis dan menampilkan kemungkinan jenis anemia dengan tingkat kecocokan minimal <strong>80%</strong>.</p>
+        <p class="lead">Centang gejala yang Anda alami. Sistem akan menganalisis kemungkinan jenis anemia. <strong>Aturan diagnosa:</strong> pilih minimal 1 gejala umum (G01–G05) dan minimal 1 gejala spesifik dari kemungkinan penyakit.</p>
     </div>
 
     <form action="proses.php" method="post" data-testid="diagnosa-form" onsubmit="return validateDiagnosa();">
