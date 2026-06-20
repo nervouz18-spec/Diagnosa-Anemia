@@ -123,6 +123,14 @@ include 'partials/public_header.php';
                 <?php endforeach; ?>
             </div>
 
+            <div id="warningAllGejala" class="alert alert-warning" style="display:none;margin-top:1rem;" data-testid="warning-all-gejala">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <div>
+                    <strong>Peringatan!</strong>
+                    Anda memilih <span id="warningCount">terlalu banyak</span> gejala sekaligus. Tidak mungkin seseorang mengalami seluruh gejala anemia secara bersamaan. Mohon pilih hanya gejala yang benar-benar Anda rasakan agar hasil diagnosa lebih akurat.
+                </div>
+            </div>
+
             <div class="flex flex-between flex-wrap gap-md mt-md">
                 <div class="text-muted text-sm"><i class="fa-solid fa-circle-info"></i> Minimal pilih 1 gejala untuk diagnosa.</div>
                 <div style="display:flex;gap:.5rem;">
@@ -135,17 +143,32 @@ include 'partials/public_header.php';
 </main>
 
 <script>
+const TOTAL_GEJALA = document.querySelectorAll('input[name="gejala[]"]').length;
+const WARN_THRESHOLD = Math.max(10, Math.ceil(TOTAL_GEJALA * 0.7)); // 70% atau minimal 10
+
 function updateCount() {
-    const n = document.querySelectorAll('input[name="gejala[]"]:checked').length;
-    document.getElementById('countLabel').textContent = n + ' dipilih';
+    const checked = document.querySelectorAll('input[name="gejala[]"]:checked').length;
+    document.getElementById('countLabel').textContent = checked + ' dipilih';
+
+    const warningEl = document.getElementById('warningAllGejala');
+    const warningCountEl = document.getElementById('warningCount');
+    if (checked >= WARN_THRESHOLD) {
+        warningCountEl.textContent = checked + ' dari ' + TOTAL_GEJALA;
+        warningEl.style.display = 'flex';
+    } else {
+        warningEl.style.display = 'none';
+    }
 }
 function clearAll() {
     document.querySelectorAll('input[name="gejala[]"]').forEach(c => c.checked = false);
     updateCount();
 }
 function validateDiagnosa() {
-    const n = document.querySelectorAll('input[name="gejala[]"]:checked').length;
-    if (n === 0) { alert('Silakan pilih minimal 1 gejala terlebih dahulu.'); return false; }
+    const checked = document.querySelectorAll('input[name="gejala[]"]:checked').length;
+    if (checked === 0) { alert('Silakan pilih minimal 1 gejala terlebih dahulu.'); return false; }
+    if (checked >= WARN_THRESHOLD) {
+        return confirm('Peringatan: Anda memilih ' + checked + ' dari ' + TOTAL_GEJALA + ' gejala. Tidak mungkin seseorang mengalami seluruh gejala anemia secara bersamaan. Yakin ingin melanjutkan diagnosa?');
+    }
     return true;
 }
 </script>

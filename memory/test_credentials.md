@@ -14,5 +14,5 @@
 - Root (untuk maintenance): `mysql -uroot` (unix socket auth, tanpa password)
 
 ## App URL
-- Public: `https://c2bbc92d-ee48-4937-9999-f6f968f91365.preview.emergentagent.com/index.php`
-- Admin login: `https://c2bbc92d-ee48-4937-9999-f6f968f91365.preview.emergentagent.com/admin/login.php`
+- Public: `https://multi-disease-alert.preview.emergentagent.com/index.php`
+- Admin login: `https://multi-disease-alert.preview.emergentagent.com/admin/login.php`

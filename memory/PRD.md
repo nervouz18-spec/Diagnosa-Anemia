@@ -102,3 +102,16 @@ Setiap kartu hasil menampilkan:
 - P2: Print-friendly stylesheet untuk halaman hasil
 - P3: Bulk upload deskripsi gejala via CSV import
 - P3: Tampilkan top-N hasil saja jika terlalu banyak penyakit muncul sekaligus
+
+## Update 2026-01: Warning System
+
+### Implemented (2026-01)
+1. **Warning Pilih Semua Gejala** (index.php)
+   - Muncul saat user memilih ≥70% dari total gejala (atau minimal 10)
+   - Warning inline + confirm dialog saat submit
+   - data-testid: `warning-all-gejala`
+
+2. **Warning Hasil Diagnosa** (hasil.php)
+   - `>5 penyakit` terdeteksi: warning merah "Tidak mungkin seseorang terkena semua penyakit anemia di waktu yang bersamaan"
+   - `>2 dan <5 penyakit` (3-4): warning kuning "Untuk segera ke dokter secepatnya agar mengetahui penyakit yang lebih pasti"
+   - data-testid: `warning-too-many`, `warning-see-doctor`

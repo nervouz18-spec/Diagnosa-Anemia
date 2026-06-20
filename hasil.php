@@ -57,6 +57,26 @@ include 'partials/public_header.php';
 
     <h3 style="margin-top:2rem;margin-bottom:1rem;">Kemungkinan Jenis Anemia</h3>
 
+    <?php $jumlah_penyakit = count($hasil_diagnosa); ?>
+    <?php if ($jumlah_penyakit > 5): ?>
+        <div class="alert alert-danger" data-testid="warning-too-many" style="margin-bottom:1rem;background:#fee2e2;border-left:4px solid #dc2626;color:#7f1d1d;padding:1rem;display:flex;gap:.6rem;align-items:flex-start;border-radius:.5rem;">
+            <i class="fa-solid fa-circle-exclamation" style="color:#dc2626;font-size:1.25rem;margin-top:.15rem;"></i>
+            <div>
+                <strong>Peringatan!</strong><br>
+                Tidak mungkin seseorang terkena <strong><?php echo $jumlah_penyakit; ?> jenis penyakit anemia</strong> di waktu yang bersamaan.
+                Hasil ini muncul karena Anda memilih terlalu banyak gejala. Mohon ulangi diagnosa dan pilih hanya gejala yang benar-benar Anda rasakan agar hasil lebih akurat.
+            </div>
+        </div>
+    <?php elseif ($jumlah_penyakit > 2 && $jumlah_penyakit < 5): ?>
+        <div class="alert alert-warning" data-testid="warning-see-doctor" style="margin-bottom:1rem;">
+            <i class="fa-solid fa-user-doctor"></i>
+            <div>
+                <strong>Untuk segera ke dokter secepatnya agar mengetahui penyakit yang lebih pasti.</strong><br>
+                Sistem mendeteksi <strong><?php echo $jumlah_penyakit; ?> kemungkinan jenis anemia</strong>. Konsultasi langsung dengan tenaga medis sangat disarankan untuk pemeriksaan lebih lanjut.
+            </div>
+        </div>
+    <?php endif; ?>
+
     <?php if (count($hasil_diagnosa) > 0): ?>
         <?php foreach ($hasil_diagnosa as $i => $hasil): ?>
         <div class="card" data-testid="result-<?php echo $i; ?>" style="border-left:4px solid var(--primary);">
